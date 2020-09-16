@@ -46,6 +46,19 @@ WordCount *word_counts = NULL;
  */
 int num_words(FILE* infile) {
   int num_words = 0;
+  while(1){
+  int c = fgetc(infile);
+  if(isalpha(c)){
+   continue;
+   }
+  else if(c != EOF){
+   num_words++;
+   }
+   else{
+   num_words++;
+   break;
+   }
+  }
 
   return num_words;
 }
@@ -57,6 +70,30 @@ int num_words(FILE* infile) {
  * Useful functions: fgetc(), isalpha(), tolower(), add_word().
  */
 void count_words(WordCount **wclist, FILE *infile) {
+    char* word =(char*) malloc(sizeof(char)*(MAX_WORD_LEN+1));
+    int len_word = 0;
+    while(true){
+    int c = fgetc(infile);
+    if (c == EOF){
+	printf("meet EOF do not add_word\n");
+        //add_word(wclist,word);
+	//printf("finished run add_word\n");
+     free(word);
+     break;
+     }
+    else if(isalpha(c)){
+      *(word+len_word) = (char)c;
+      len_word++;
+     }
+     else{ // space character
+      *(word+len_word) = '\0';
+	printf("going to run add_word\n");
+      add_word(wclist, word);
+	printf("finished run add_word\n");
+      len_word = 0;
+     }
+    }
+	
 }
 
 /*
@@ -64,7 +101,12 @@ void count_words(WordCount **wclist, FILE *infile) {
  * Useful function: strcmp().
  */
 static bool wordcount_less(const WordCount *wc1, const WordCount *wc2) {
-  return 0;
+	if(strcmp(wc1->word, wc2->word)<0){
+         return 1;	
+	}
+	else{
+	 return 0;
+	}
 }
 
 // In trying times, displays a helpful message.
@@ -123,14 +165,29 @@ int main (int argc, char *argv[]) {
 
   /* Create the empty data structure */
   init_words(&word_counts);
+  printf("just init_words\n");
 
   if ((argc - optind) < 1) {
     // No input file specified, instead, read from STDIN instead.
     infile = stdin;
   } else {
+	  for(int fileid = optind; fileid<=argc-1; fileid++){
+	  char* addr = argv[fileid];
+	  FILE* file = fopen(addr, "r");
+	  printf("going to run count_words\n");
+	  count_words(&word_counts,file);
+	  printf("finished run count_words\n");
+	  fclose(file);
+	  }
     // At least one file specified. Useful functions: fopen(), fclose().
     // The first file can be found at argv[optind]. The last file can be
     // found at argv[argc-1].
+    WordCount *ptr = word_counts;
+    while(ptr != NULL){
+     total_words += ptr->count;
+     ptr = ptr->next; 
+    }
+
   }
 
   if (count_mode) {
