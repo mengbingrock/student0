@@ -42,12 +42,14 @@ int main(int argc, char *argv[]) {
   somethingshared = targs;
   for(t = 0; t < nthreads; t++) {
     printf("main: creating thread %ld\n", t);
+    printf("%p\n",(void*)t);
     rc = pthread_create(&threads[t], NULL, threadfun, (void *)t);
     if (rc) {
       printf("ERROR; return code from pthread_create() is %d\n", rc);
       exit(-1);
     }
   }
+  printf("main about to exit\n");
 
   /* Last thing that main() should do */
   pthread_exit(NULL);
