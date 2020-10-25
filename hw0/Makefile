@@ -14,3 +14,9 @@ limits:
 
 clean:
 	rm -f $(BINARIES)
+try:
+	$(CC) -m32 -S -o map.S map.c
+	$(CC) -m32 -S -o recurse.S recurse.c
+	$(CC) -m32 -c map.S -o map.o
+	$(CC) -m32 -c recurse.c -o recurse.o
+	$(CC) -m32 map.o recurse.o -o map

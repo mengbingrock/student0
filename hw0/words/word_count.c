@@ -73,7 +73,7 @@ void add_word(WordCount **wclist, char *word) {
 	newCW->word = new_string(word);
 	newCW->count = 1;
 	newCW->next = p;
-	*wclist = newCW; // why?
+	*wclist = newCW; // why?  change where the pointer wclist points to
 	}
 
 
