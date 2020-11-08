@@ -182,6 +182,8 @@ void get_env_array(env_struct_t* arg)
     //return array;
 }
 
+struct sigaction p_newact, c_newact;
+
 int fds[2];
 int old_stdout;
 void run_cmd(struct tokens* tokens, int token_start_idx)
@@ -294,6 +296,24 @@ void run_cmd(struct tokens* tokens, int token_start_idx)
       exit(1);
       }
 
+  
+
+
+void undo_signal() {
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+    signal(SIGTSTP, SIG_DFL);
+    signal(SIGTTIN, SIG_DFL);
+    signal(SIGTTOU, SIG_DFL);
+}
+
+void ign_signal() {
+    signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
+}
 
 int main(unused int argc, unused char *argv[]) {
   init_shell();
@@ -306,6 +326,7 @@ int main(unused int argc, unused char *argv[]) {
   //printf("env_var[0] is %s\n",env_var.env_array[0]);
   //printf("array length is %i\n",env_var.num);
 
+  ign_signal(); // ignore sigmal of main shell
   /* Please only print shell prompts when standard input is not a tty */
   if (shell_is_interactive)
     fprintf(stdout, "%d: ", line_num);
@@ -328,7 +349,8 @@ int main(unused int argc, unused char *argv[]) {
       tcpid = wait(&status); // parents(shell process) wait
       }      
       else if(cpid == 0){
-	      run_cmd(tokens, 0 ); // token start idx for first execution 
+	undo_signal();
+	run_cmd(tokens, 0 ); // token start idx for first execution 
       }
 
  
